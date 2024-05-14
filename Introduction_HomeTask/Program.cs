@@ -1,6 +1,8 @@
 using Introduction_HomeTask.Configurations;
 using Introduction_HomeTask.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 
 namespace Introduction_HomeTask
 {
@@ -11,6 +13,16 @@ namespace Introduction_HomeTask
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.Configure<ProductOptions>(builder.Configuration.GetSection(ProductOptions.ConfigName));
+
+            var logPath = Path.Combine(Environment.CurrentDirectory, "log/log_.log");
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .WriteTo.Console()
+                .WriteTo.File(logPath, rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+
+            builder.Logging.AddSerilog(logger);
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<NorthwindContext>();
@@ -18,11 +30,11 @@ namespace Introduction_HomeTask
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                
                 app.UseHsts();
             }
 
