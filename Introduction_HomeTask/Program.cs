@@ -1,5 +1,6 @@
 using Introduction_HomeTask.Configurations;
 using Introduction_HomeTask.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -23,6 +24,7 @@ namespace Introduction_HomeTask
                 .CreateLogger();
 
             builder.Logging.AddSerilog(logger);
+            builder.Services.AddExceptionHandler<CustomExceptionHandler>();
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<NorthwindContext>();
@@ -50,6 +52,26 @@ namespace Introduction_HomeTask
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+        }
+    }
+
+    public class CustomExceptionHandler : IExceptionHandler
+    {
+        private readonly ILogger<CustomExceptionHandler> logger;
+        public CustomExceptionHandler(ILogger<CustomExceptionHandler> logger)
+        {
+            this.logger = logger;
+        }
+        public ValueTask<bool> TryHandleAsync(
+            HttpContext httpContext,
+            Exception exception,
+            CancellationToken cancellationToken)
+        {
+            var exceptionMessage = exception.Message;
+            logger.LogError(
+                "Error Message: {exceptionMessage}, Time of occurrence {time}",
+                exceptionMessage, DateTime.UtcNow);
+            return ValueTask.FromResult(false);
         }
     }
 }
