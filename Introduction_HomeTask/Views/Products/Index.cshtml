@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Introduction_HomeTask.Models.Product>
+﻿@model PaginatedList<Introduction_HomeTask.Models.Product>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,31 +13,31 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ProductName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().ProductName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.QuantityPerUnit)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().QuantityPerUnit)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().UnitPrice)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitsInStock)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().UnitsInStock)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitsOnOrder)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().UnitsOnOrder)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ReorderLevel)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().ReorderLevel)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Discontinued)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Discontinued)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Category)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Supplier)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Supplier)
             </th>
             <th></th>
         </tr>
@@ -79,3 +79,18 @@
 }
     </tbody>
 </table>
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>

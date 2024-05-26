@@ -6,23 +6,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Introduction_HomeTask.Models;
+using Introduction_HomeTask.Configurations;
+using Microsoft.Extensions.Options;
+using Introduction_HomeTask.Pagination;
 
 namespace Introduction_HomeTask.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly NorthwindContext _context;
+        private readonly ProductOptions _options;
 
-        public ProductsController(NorthwindContext context)
+        public ProductsController(NorthwindContext context, IOptions<ProductOptions> productOptions)
         {
             _context = context;
+            _options = productOptions.Value;
         }
 
         
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? pageNumber)
         {
-            var northwindContext = _context.Products.Include(p => p.Category).Include(p => p.Supplier);
-            return View(await northwindContext.ToListAsync());
+            var northwindContext = _context.Products.Include(p => p.Category).Include(p => p.Supplier).OrderBy(p => p.ProductId);
+
+            return View(await PaginatedList<Product>.CreateAsync(northwindContext, pageNumber ?? 1, _options.MaxAmountOfProducts));
+
+            //return View(await northwindContext.ToListAsync());
         }
 
         
