@@ -1,5 +1,12 @@
 ﻿@model IEnumerable<Introduction_HomeTask.Models.Category>
-
+<style>
+    img {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+        width: 150px;
+    }
+</style>
 @{
     ViewData["Title"] = "List Of Categories";
 }
@@ -15,6 +22,10 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Picture)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -25,6 +36,16 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                    @{
+                        string imreBase64Data = Convert.ToBase64String(item.Picture);
+                        string imgDataURL = string.Format("data:image/png;base64,{0}", imreBase64Data);
+                    }
+                    <img src="@imgDataURL" alt="@item.CategoryName" />
+            </td>
+            <td>
+                    <a asp-action="EditPicture" asp-route-id="@item.CategoryId">Edit Picture</a>
             </td>
         </tr>
 }
