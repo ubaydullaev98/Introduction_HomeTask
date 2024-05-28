@@ -1,5 +1,6 @@
 using Introduction_HomeTask.Configurations;
 using Introduction_HomeTask.Models;
+using Introduction_HomeTask.Services;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -28,7 +29,12 @@ namespace Introduction_HomeTask
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<NorthwindContext>();
+
             
+            builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+            builder.Services.AddTransient<IProductsRepository, ProductsRepository>();
+            builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             var app = builder.Build();
 

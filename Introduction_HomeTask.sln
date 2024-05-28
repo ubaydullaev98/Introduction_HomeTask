@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Introduction_HomeTask", "Introduction_HomeTask\Introduction_HomeTask.csproj", "{D14C6E2B-8B26-49C8-856F-9D612E59E815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Introduction_HomeTask", "Introduction_HomeTask\Introduction_HomeTask.csproj", "{D14C6E2B-8B26-49C8-856F-9D612E59E815}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HomeTask.Tests", "HomeTask.Tests\HomeTask.Tests.csproj", "{0D3C5825-A27D-4195-AA65-1A1A1DAA4163}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D14C6E2B-8B26-49C8-856F-9D612E59E815}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D14C6E2B-8B26-49C8-856F-9D612E59E815}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D14C6E2B-8B26-49C8-856F-9D612E59E815}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D3C5825-A27D-4195-AA65-1A1A1DAA4163}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D3C5825-A27D-4195-AA65-1A1A1DAA4163}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D3C5825-A27D-4195-AA65-1A1A1DAA4163}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D3C5825-A27D-4195-AA65-1A1A1DAA4163}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

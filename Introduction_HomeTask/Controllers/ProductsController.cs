@@ -1,104 +1,79 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Introduction_HomeTask.Models;
 using Introduction_HomeTask.Configurations;
 using Microsoft.Extensions.Options;
 using Introduction_HomeTask.Pagination;
+using Introduction_HomeTask.Services;
 
 namespace Introduction_HomeTask.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly NorthwindContext _context;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ProductOptions _options;
 
-        public ProductsController(NorthwindContext context, IOptions<ProductOptions> productOptions)
+        public ProductsController(IUnitOfWork unitOfWork, IOptions<ProductOptions> productOptions)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
             _options = productOptions.Value;
         }
 
         
-        public async Task<IActionResult> Index(int? pageNumber)
+        public IActionResult Index(int? pageNumber)
         {
-            var northwindContext = _context.Products.Include(p => p.Category).Include(p => p.Supplier).OrderBy(p => p.ProductId);
+            var products = _unitOfWork.Products.GetAllIncludingSupplierAndCategories();
 
-            return View(await PaginatedList<Product>.CreateAsync(northwindContext, pageNumber ?? 1, _options.MaxAmountOfProducts));
-
-            //return View(await northwindContext.ToListAsync());
-        }
-
-        
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .Include(p => p.Supplier)
-                .FirstOrDefaultAsync(m => m.ProductId == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
+            return View(PaginatedList<Product>.Create(products, pageNumber ?? 1, _options.MaxAmountOfProducts));
         }
 
         
         public IActionResult Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId");
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId");
+            ViewData["CategoryId"] = new SelectList(_unitOfWork.Categories.GetAll(), "CategoryId", "CategoryId");
+            ViewData["SupplierId"] = new SelectList(_unitOfWork.GetSuppliers(), "SupplierId", "SupplierId");
             return View();
         }
 
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Product product)
+        public IActionResult Create([Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Product product)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
+                _unitOfWork.Products.Add(product);
+                _unitOfWork.Complete();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(_unitOfWork.Categories.GetAll(), "CategoryId", "CategoryId", product.CategoryId);
+            ViewData["SupplierId"] = new SelectList(_unitOfWork.GetSuppliers(), "SupplierId", "SupplierId", product.SupplierId);
             return View(product);
         }
 
        
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var product = _unitOfWork.Products.GetById((int)id);
             if (product == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(_unitOfWork.Categories.GetAll(), "CategoryId", "CategoryId", product.CategoryId);
+            ViewData["SupplierId"] = new SelectList(_unitOfWork.GetSuppliers(), "SupplierId", "SupplierId", product.SupplierId);
             return View(product);
         }
 
         
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Product product)
+        public IActionResult Edit(int id, [Bind("ProductId,ProductName,SupplierId,CategoryId,QuantityPerUnit,UnitPrice,UnitsInStock,UnitsOnOrder,ReorderLevel,Discontinued")] Product product)
         {
             if (id != product.ProductId)
             {
@@ -109,8 +84,8 @@ namespace Introduction_HomeTask.Controllers
             {
                 try
                 {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
+                    _unitOfWork.Products.Update(product);
+                    _unitOfWork.Complete();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -125,15 +100,15 @@ namespace Introduction_HomeTask.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryId", product.CategoryId);
-            ViewData["SupplierId"] = new SelectList(_context.Suppliers, "SupplierId", "SupplierId", product.SupplierId);
+            ViewData["CategoryId"] = new SelectList(_unitOfWork.Categories.GetAll(), "CategoryId", "CategoryId", product.CategoryId);
+            ViewData["SupplierId"] = new SelectList(_unitOfWork.GetSuppliers(), "SupplierId", "SupplierId", product.SupplierId);
             return View(product);
         }
 
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(e => e.ProductId == id);
+            return _unitOfWork.Products.GetAll().Any(e => e.ProductId == id);
         }
     }
 }
