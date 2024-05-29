@@ -2,6 +2,7 @@ using Introduction_HomeTask.Configurations;
 using Introduction_HomeTask.Models;
 using Introduction_HomeTask.Services;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
@@ -52,6 +53,11 @@ namespace Introduction_HomeTask
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.MapControllerRoute(name: "image",
+            pattern: "image/{id}",
+            defaults: new { controller = "Categories", action = "GetCategoryImage", id = 1 });
+
 
             app.MapControllerRoute(
                 name: "default",
